@@ -1,17 +1,17 @@
 package chess
 
-case class Opening private(code: String, family: String, name: String, moves: List[String]) {
+case class Opening(code: String, family: String, name: String, moves: List[String]) {
   override def toString = s"$code $name (${moves.size})"
 }
 
 case object Opening {
-  def apply(code: String, name: String, moves: String): Opening = {
+  def parse(code: String, name: String, moves: String): Opening = {
     val family = name takeWhile { _ != ',' }
     new Opening(code, family, name, moves.split(" ").toList)
   }
 }
 
-object Openings {   // TODO fold into Opening
+object Openings {   // TODO fold into OpeningDB
   lazy val codeFamily: Map[String, String] = {
     OpeningDB.db.foldLeft(Map[String, List[String]]()) {
       case (acc, opening) =>
@@ -46,9 +46,7 @@ object Openings {   // TODO fold into Opening
     OpeningDB.db.map(_.code).distinct.sorted flatMap { code =>
       val candidates = OpeningDB.db filter (_.code == code)
       candidates find (_.name endsWith "General") orElse
-        candidates.sortBy(_.moves.size).headOption map {
-          case Opening(a, b, _) => a -> b
-        }
+        candidates.sortBy(_.moves.size).headOption map { opening => opening.code -> opening.name }
     }
   }
 }
