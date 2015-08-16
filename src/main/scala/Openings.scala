@@ -1,27 +1,31 @@
 package chess
 
-case class Opening(code: String, name: String, moves: String) {
+case class Opening private(code: String, name: String, moves: Seq[String]) {
+  val family = name takeWhile { _ != ',' }
 
-  def fullName = s"$code $name"
+  def fullName = s"$code $name"    // TODO refactor out
 
-  lazy val moveList = moves.split(' ').toList
+  lazy val moveList = moves.toList   // TODO refactor out
 
-  def firstMove = moveList.headOption
+  def firstMove = moves.headOption    // TODO refactor out
 
-  lazy val size = moveList.size
+  def size = moves.size   // TODO refactor out
 
-  def familyName = name.takeWhile(',' !=)
+  def familyName = family  // TODO refactor out
 
-  override def toString = s"$code $name ($size)"
+  override def toString = s"$fullName ($size)"
 }
 
-object Openings {
+case object Opening {
+  def apply(code: String, name: String, moves: String): Opening =
+    new Opening(code, name, moves.split(" "))
+}
 
+object Openings {   // TODO fold into Opening
   lazy val codeFamily: Map[String, String] = {
     OpeningDB.db.foldLeft(Map[String, List[String]]()) {
-      case (acc, Opening(code, name, _)) =>
-        val family = name.takeWhile(',' !=)
-        acc + (code -> (family :: acc.getOrElse(code, Nil)))
+      case (acc, opening) =>
+        acc + (opening.code -> (opening.family :: acc.getOrElse(opening.code, Nil)))
     }.flatMap {
       case (code, families) =>
         families
