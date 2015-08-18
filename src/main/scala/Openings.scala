@@ -36,6 +36,9 @@ object Openings {   // TODO fold into OpeningDB
           .map(_._1)                // Omits the cardinality
           .map(code -> _)           // And re-maps the code to the "best" family
     }
+
+    // Note that the data is constructed such that it's impossible to have a code with no family, therefore
+    // the flatMap and Option wrangling is unnecessary.
   }
 
   lazy val familyFirstMove: Map[String, String] = OpeningDB.db.foldLeft(Map[String, String]()) {
