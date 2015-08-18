@@ -13,7 +13,13 @@ case object Opening {
 
 object Openings {   // TODO fold into OpeningDB
 
-  implicit class ToMultimapEnrichment[T](coll: TraversableOnce[T]) {
+  trait Histogram[T] {
+    def cardinalities: Map[T, Int]
+    def mostFrequent: T
+    def leastFrequent: T
+  }
+
+  implicit class ToMultimapEnrichment[T](coll: Iterable[T]) {
     def toMultimap[K, V](mapKey: T => K, mapElement: T => V): Map[K, Seq[V]] = {
       coll.foldLeft(Map.empty[K, List[V]]) {
         case (mmap, e) =>
@@ -21,18 +27,19 @@ object Openings {   // TODO fold into OpeningDB
           mmap + (key -> (mapElement(e) :: mmap.getOrElse(key, Nil)))
       }
     }
+
+    def histogram: Histogram[T] = new Histogram[T] {
+      val cardinalities = coll.groupBy(identity).mapValues(_.size)
+      def mostFrequent = cardinalities.maxBy(_._2)._1
+      def leastFrequent = cardinalities.minBy(_._2)._1
+    }
   }
 
   lazy val codeFamily: Map[String, String] = {
     val codeFamilies = OpeningDB.db.toMultimap(_.code, _.family)
 
     def selectBestFamily(families: Seq[String]): String =
-      families
-          .groupBy(identity)
-          .mapValues(_.size)        // Maps family->cardinality...
-          .toList.sortBy(-_._2)     // ...sorts by size in descending order
-          .head                     // Takes the "best" family
-          ._1                       // Omits the cardinality
+      families.histogram.mostFrequent
 
     codeFamilies.mapValues(selectBestFamily)
   }
