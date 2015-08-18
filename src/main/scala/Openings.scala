@@ -12,11 +12,21 @@ case object Opening {
 }
 
 object Openings {   // TODO fold into OpeningDB
+
+  implicit class ToMultimapEnrichment[T](coll: TraversableOnce[T]) {
+    def toMultimap[K, V](mapKey: T => K, mapElement: T => V): Map[K, Seq[V]] = {
+      coll.foldLeft(Map.empty[K, List[V]]) {
+        case (mmap, e) =>
+          val key = mapKey(e)
+          mmap + (key -> (mapElement(e) :: mmap.getOrElse(key, Nil)))
+      }
+    }
+  }
+
   lazy val codeFamily: Map[String, String] = {
-    OpeningDB.db.foldLeft(Map[String, List[String]]()) {
-      case (acc, opening) =>
-        acc + (opening.code -> (opening.family :: acc.getOrElse(opening.code, Nil)))
-    }.flatMap {
+    val codeFamilies = OpeningDB.db.toMultimap(_.code, _.family)
+
+    codeFamilies.flatMap {
       case (code, families) =>
         families
           .groupBy(identity)
