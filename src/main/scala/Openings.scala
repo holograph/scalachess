@@ -30,11 +30,11 @@ object Openings {   // TODO fold into OpeningDB
       case (code, families) =>
         families
           .groupBy(identity)
-          .mapValues(_.size)
-          .toList.sortBy(-_._2)
-          .headOption
-          .map(_._1)
-          .map(code -> _)
+          .mapValues(_.size)        // Maps family->cardinality...
+          .toList.sortBy(-_._2)     // ...sorts by size in descending order
+          .headOption               // Takes the "best" family
+          .map(_._1)                // Omits the cardinality
+          .map(code -> _)           // And re-maps the code to the "best" family
     }
   }
 
