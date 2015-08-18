@@ -26,15 +26,15 @@ object Openings {   // TODO fold into OpeningDB
   lazy val codeFamily: Map[String, String] = {
     val codeFamilies = OpeningDB.db.toMultimap(_.code, _.family)
 
-    codeFamilies.map {
-      case (code, families) =>
-        code -> families
+    def selectBestFamily(families: Seq[String]): String =
+      families
           .groupBy(identity)
           .mapValues(_.size)        // Maps family->cardinality...
           .toList.sortBy(-_._2)     // ...sorts by size in descending order
           .head                     // Takes the "best" family
           ._1                       // Omits the cardinality
-    }
+
+    codeFamilies.mapValues(selectBestFamily)
   }
 
   lazy val familyFirstMove: Map[String, String] = OpeningDB.db.foldLeft(Map[String, String]()) {
