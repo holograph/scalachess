@@ -30,7 +30,7 @@ object Forsyth {
     case c :: rest => c match {
       case n if n.toInt < 58 =>
         makePieces(rest, tore(pos, n.toInt - 48) getOrElse pos)
-      case n => Role forsyth n.toLower map { role =>
+      case n => roleFor(n.toLower) map { role =>
         (pos, Piece(Color(n.isUpper), role)) :: {
           tore(pos, 1) flatMap { makePieces(rest, _) } getOrElse Nil
         }
@@ -148,5 +148,23 @@ object Forsyth {
       s"$boardStr $color $c2 ${rest.mkString(" ")}"
     }
     case _ => None
+  }
+
+  def forRole(role: Role): Char = role match {
+    case King => 'k'
+    case Queen => 'q'
+    case Rook => 'r'
+    case Bishop => 'b'
+    case Knight => 'n'
+    case Pawn => 'p'
+  }
+
+  def roleFor(c: Char): Option[Role] = c match {
+    case 'k' => Some(King)
+    case 'q' => Some(Queen)
+    case 'r' => Some(Rook)
+    case 'b' => Some(Bishop)
+    case 'n' => Some(Knight)
+    case 'p' => Some(Pawn)
   }
 }

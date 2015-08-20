@@ -112,3 +112,7 @@ case class Move(
     s"$san$nagSymbol$commentOrTime$variationString"
   }
 }
+
+case object Pgn {
+  def forRole(role: Role) = Forsyth.forRole(role).toUpper
+}
