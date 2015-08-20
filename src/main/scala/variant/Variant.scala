@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import Pos.posAt
+import Pos.at
 import scalaz.Validation.FlatMap._
 
 abstract class Variant(
@@ -161,7 +161,7 @@ object Variant {
 
   private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
     (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
-      posAt(x, y) map { pos =>
+      at(x, y) map { pos =>
         (pos, y match {
           case 1 => White - rank(x - 1)
           case 2 => White.pawn

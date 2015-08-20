@@ -1,6 +1,6 @@
 package chess
 
-import Pos.posAt
+import Pos.at
 import scalaz.Validation.FlatMap._
 import variant.Variant
 
@@ -13,7 +13,7 @@ case class Board(
 
   def apply(at: Pos): Option[Piece] = pieces get at
 
-  def apply(x: Int, y: Int): Option[Piece] = posAt(x, y) flatMap pieces.get
+  def apply(x: Int, y: Int): Option[Piece] = at(x, y) flatMap pieces.get
 
   lazy val actors: Map[Pos, Actor] = pieces map {
     case (pos, piece) => (pos, Actor(piece, pos, this))

@@ -21,10 +21,10 @@ case object Horde extends Variant(
     val whitePawnsHoard = frontPawns ++ (for {
       x <- 1 to 8
       y <- 1 to 4
-    } yield Pos.posAt(x, y) map (_ -> White.pawn)).flatten toMap
+    } yield Pos.at(x, y) map (_ -> White.pawn)).flatten toMap
 
     val blackPieces = (for (y <- 7 to 8; x <- 1 to 8) yield {
-      posAt(x, y) map { pos =>
+      at(x, y) map { pos =>
         (pos, y match {
           case 8 => Black - backRank(x - 1)
           case 7 => Black.pawn

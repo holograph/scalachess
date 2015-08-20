@@ -17,8 +17,8 @@ object UciMove
     with scalaz.syntax.ToTraverseOps {
 
   def apply(move: String): Option[UciMove] = for {
-    orig ← Pos.posAt(move take 2)
-    dest ← Pos.posAt(move drop 2 take 2)
+    orig ← Pos.at(move take 2)
+    dest ← Pos.at(move drop 2 take 2)
     promotion = move lift 4 flatMap Role.promotable
   } yield UciMove(orig, dest, promotion)
 

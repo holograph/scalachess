@@ -1,7 +1,5 @@
 package chess
 
-import Pos._
-
 sealed trait Role {
   val forsyth: Char
   lazy val forsythUpper: Char = forsyth.toUpper
@@ -34,11 +32,11 @@ case object Queen extends PromotableRole {
 case object Rook extends PromotableRole {
   val forsyth = 'r'
   val dirs: Directions = List(_.up, _.down, _.left, _.right)
-  def dir(from: Pos, to: Pos) = if (to ?| from) Some(
-    if (to ?^ from) (_.up) else (_.down)
+  def dir(from: Pos, to: Pos) = if (to onSameColumnAs from) Some(
+    if (to isAbove from) (_.up) else (_.down)
   )
-  else if (to ?- from) Some(
-    if (to ?< from) (_.left) else (_.right)
+  else if (to onSameRowAs from) Some(
+    if (to isLeftOf from) (_.left) else (_.right)
   )
   else None
   val projection = true
@@ -46,12 +44,12 @@ case object Rook extends PromotableRole {
 case object Bishop extends PromotableRole {
   val forsyth = 'b'
   val dirs: Directions = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
-  def dir(from: Pos, to: Pos) = if (to onSameDiagonal from) Some(
-    if (to ?^ from) {
-      if (to ?< from) (_.upLeft) else (_.upRight)
+  def dir(from: Pos, to: Pos) = if (to onSameDiagonalAs from) Some(
+    if (to isAbove from) {
+      if (to isLeftOf from) (_.upLeft) else (_.upRight)
     }
     else {
-      if (to ?< from) (_.downLeft) else (_.downRight)
+      if (to isLeftOf from) (_.downLeft) else (_.downRight)
     }
   )
   else None

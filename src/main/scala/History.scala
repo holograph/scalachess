@@ -1,6 +1,6 @@
 package chess
 
-import Pos.posAt
+import Pos.at
 
 case class CheckCount(white: Int = 0, black: Int = 0) {
 
@@ -82,7 +82,7 @@ object History {
     lastMove: Option[String], // a2a4
     castles: String): History = make(
     lastMove = lastMove flatMap {
-      case MoveString(a, b) => for (o ← posAt(a); d ← posAt(b)) yield (o, d)
+      case MoveString(a, b) => for (o ← at(a); d ← at(b)) yield (o, d)
       case _                => None
     },
     positionHashes = Array(),

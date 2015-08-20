@@ -53,8 +53,8 @@ object Divider {
       if (p.role == Pawn || p.role == King) v else v + 1
     }
 
-  private val whiteBackRank: List[Pos] = (1 to 8).toList flatMap { Pos.posAt(_, 1) }
-  private val blackBackRank: List[Pos] = (1 to 8).toList flatMap { Pos.posAt(_, 8) }
+  private val whiteBackRank: List[Pos] = (1 to 8).toList flatMap { Pos.at(_, 1) }
+  private val blackBackRank: List[Pos] = (1 to 8).toList flatMap { Pos.at(_, 8) }
 
   private def backRankSparse(board: Board): Boolean =
     // Sparse back-rank indicates that pieces have been developed
@@ -101,7 +101,7 @@ object Divider {
       for {
         dy <- 0 to 1
         dx <- 0 to 1
-      } yield Pos.posAt(x + dx, y + dy)
+      } yield Pos.at(x + dx, y + dy)
     }.toList.flatten
   }.toList
 

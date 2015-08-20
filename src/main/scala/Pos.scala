@@ -5,12 +5,12 @@ import scala.math.{ min, max, abs }
 
 sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 
-  import Pos.posAt
+  import Pos.at
 
-  lazy val up: Option[Pos] = posAt(x, y + 1)
-  lazy val down: Option[Pos] = posAt(x, y - 1)
-  lazy val right: Option[Pos] = posAt(x + 1, y)
-  lazy val left: Option[Pos] = posAt(x - 1, y)
+  lazy val up: Option[Pos] = at(x, y + 1)
+  lazy val down: Option[Pos] = at(x, y - 1)
+  lazy val right: Option[Pos] = at(x + 1, y)
+  lazy val left: Option[Pos] = at(x - 1, y)
   lazy val upLeft: Option[Pos] = up flatMap (_ left)
   lazy val upRight: Option[Pos] = up flatMap (_ right)
   lazy val downLeft: Option[Pos] = down flatMap (_ left)
@@ -21,31 +21,31 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   lazy val surroundingPositions : Set[Pos] =
     HashSet(up, down, left, right, upLeft, upRight, downLeft, downRight).flatten;
 
-  def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
-  def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
-  def |<>|(stop: Pos => Boolean, dir: Direction): List[Pos] = dir(this) map { p =>
-    p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
+  def moveRight(stop: Pos => Boolean): List[Pos] = moveTo(stop, _.right)
+  def moveLeft(stop: Pos => Boolean): List[Pos] = moveTo(stop, _.left)
+  def moveTo(stop: Pos => Boolean, dir: Direction): List[Pos] = dir(this) map { p =>
+    p :: (if (stop(p)) Nil else p.moveTo(stop, dir))
   } getOrElse Nil
 
-  def ?<(other: Pos): Boolean = x < other.x
-  def ?>(other: Pos): Boolean = x > other.x
-  def ?+(other: Pos): Boolean = y < other.y
-  def ?^(other: Pos): Boolean = y > other.y
-  def ?|(other: Pos): Boolean = x == other.x
-  def ?-(other: Pos): Boolean = y == other.y
+  def isLeftOf(other: Pos): Boolean = x < other.x
+  def isRightOf(other: Pos): Boolean = x > other.x
+  def isBelow(other: Pos): Boolean = y < other.y
+  def isAbove(other: Pos): Boolean = y > other.y
+  def onSameColumnAs(other: Pos): Boolean = x == other.x
+  def onSameRowAs(other: Pos): Boolean = y == other.y
 
-  def <->(other: Pos): Iterable[Pos] =
-    min(x, other.x) to max(x, other.x) map { posAt(_, y) } flatten
+  def rowSpan(other: Pos): Iterable[Pos] =
+    min(x, other.x) to max(x, other.x) map { at(_, y) } flatten
 
-  def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
+  def touches(other: Pos): Boolean = columnDistance(other) <= 1 && rowDistance(other) <= 1
 
-  def onSameDiagonal(other: Pos): Boolean = xDist(other) == yDist(other)
-  def onSameLine(other: Pos): Boolean = ?-(other) || ?|(other)
+  def onSameDiagonalAs(other: Pos): Boolean = columnDistance(other) == rowDistance(other)
+  def onSameLineAs(other: Pos): Boolean = onSameRowAs(other) || onSameColumnAs(other)
 
-  def xDist(other: Pos) = abs(x - other.x)
-  def yDist(other: Pos) = abs(y - other.y)
+  def columnDistance(other: Pos) = abs(x - other.x)
+  def rowDistance(other: Pos) = abs(y - other.y)
 
-  val file = Pos xToString x
+  val file = Pos columnName x
   val rank = y.toString
   val key = file + rank
   val color = Color((x % 2 == 0) ^ (y % 2 == 0))
@@ -58,15 +58,15 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 
 object Pos {
 
-  def posAt(x: Int, y: Int): Option[Pos] = allCoords get (x, y)
+  def at(x: Int, y: Int): Option[Pos] = allCoords get (x, y)
 
-  def posAt(key: String): Option[Pos] = allKeys get key
+  def at(key: String): Option[Pos] = allKeys get key
 
-  def xToString(x: Int) = (96 + x).toChar.toString
+  def columnName(x: Int) = (96 + x).toChar.toString
 
   def piotr(c: Char): Option[Pos] = allPiotrs get c
 
-  def keyToPiotr(key: String) = posAt(key) map (_.piotr)
+  def keyToPiotr(key: String) = at(key) map (_.piotr)
   def doubleKeyToPiotr(key: String) = for {
     a ← keyToPiotr(key take 2)
     b ← keyToPiotr(key drop 2)

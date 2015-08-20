@@ -8,7 +8,7 @@ object Dumper {
 
     ((promotion, piece.role) match {
       case _ if castles =>
-        if (orig ?> dest) "O-O-O" else "O-O"
+        if (orig isRightOf dest) "O-O-O" else "O-O"
 
       case _ if enpassant =>
         orig.file + 'x' + dest.key
@@ -34,10 +34,10 @@ object Dumper {
         val disambiguation = if (candidates.isEmpty) {
           ""
         }
-        else if (!candidates.exists(_ ?| orig)) {
+        else if (!candidates.exists(_ onSameColumnAs orig)) {
           orig.file
         }
-        else if (!candidates.exists(_ ?- orig)) {
+        else if (!candidates.exists(_ onSameRowAs orig)) {
           orig.rank
         }
         else {

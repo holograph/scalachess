@@ -1,7 +1,5 @@
 package chess
 
-import Pos.posAt
-
 case class Actor(
     piece: Piece,
     pos: Pos,
@@ -106,15 +104,15 @@ case class Actor(
     tripToRook = side.tripToRook(kingPos, board)
     rookPos ← tripToRook.lastOption
     if board(rookPos) == Some(color.rook)
-    newKingPos ← posAt(side.castledKingX, kingPos.y)
-    travelPoss = kingPos <-> newKingPos
+    newKingPos ← Pos.at(side.castledKingX, kingPos.y)
+    travelPoss = kingPos rowSpan newKingPos
     if !travelPoss.map(board.apply).exists {
       case Some(piece) if piece == color.rook || piece == color.king => false
       case Some(piece) => true
       case _ => false
     }
     if !travelPoss.exists(p => board.variant.kingThreatened(board, !color, p))
-    newRookPos ← posAt(side.castledRookX, rookPos.y)
+    newRookPos ← Pos.at(side.castledRookX, rookPos.y)
     b1 ← board take rookPos
     b2 ← newKingPos match {
       case p if p == kingPos => Some(b1)

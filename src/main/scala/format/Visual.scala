@@ -1,7 +1,7 @@
 package chess
 package format
 
-import Pos.posAt
+import Pos.at
 
 /**
  * r bqkb r
@@ -30,7 +30,7 @@ object Visual {
         (c, x) = char
         role ← Role forsyth c.toLower
       } yield {
-        posAt(x + 1, 8 - y) map { pos => pos -> (Color(c isUpper) - role) }
+        at(x + 1, 8 - y) map { pos => pos -> (Color(c isUpper) - role) }
       }) flatten,
       variant = chess.variant.Variant.default
     )
@@ -44,7 +44,7 @@ object Visual {
     }
     for (y ← 8 to 1 by -1) yield {
       for (x ← 1 to 8) yield {
-        posAt(x, y) flatMap markedPoss.get getOrElse board(x, y).fold(' ')(_ forsyth)
+        at(x, y) flatMap markedPoss.get getOrElse board(x, y).fold(' ')(_ forsyth)
       }
     } mkString
   } map { """\s*$""".r.replaceFirstIn(_, "") } mkString "\n"

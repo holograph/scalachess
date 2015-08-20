@@ -108,13 +108,13 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     private val Move = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
 
     def apply(str: String, variant: Variant): Valid[San] = {
-      if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos => succezz(Std(pos, Pawn)) }
+      if (str.size == 2) Pos.at(str).fold(slow(str)) { pos => succezz(Std(pos, Pawn)) }
       else str match {
         case "O-O" | "o-o" | "0-0"       => succezz(Castle(KingSide))
         case "O-O-O" | "o-o-o" | "0-0-0" => succezz(Castle(QueenSide))
         case Move(role, file, rank, capture, pos, prom, check, mate) =>
           role.headOption.fold[Option[Role]](Some(Pawn))(variant.rolesByPgn.get) flatMap { role =>
-            Pos posAt pos map { dest =>
+            Pos at pos map { dest =>
               succezz(Std(
                 dest = dest,
                 role = role,

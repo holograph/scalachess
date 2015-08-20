@@ -51,11 +51,11 @@ object Forsyth {
         val fifthRank = if (situation.color == White) 5 else 4
         val sixthRank = if (situation.color == White) 6 else 3
         val seventhRank = if (situation.color == White) 7 else 2
-        val lastMove = splitted lift 3 flatMap Pos.posAt match {
+        val lastMove = splitted lift 3 flatMap Pos.at match {
           case Some(pos) if pos.y == sixthRank
-            && Pos.posAt(pos.x, fifthRank).flatMap(situation.board.apply).contains(Piece(!situation.color, Pawn))
-            && Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty
-            && Pos.posAt(pos.x, seventhRank).flatMap(situation.board.apply).isEmpty =>
+            && Pos.at(pos.x, fifthRank).flatMap(situation.board.apply).contains(Piece(!situation.color, Pawn))
+            && Pos.at(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty
+            && Pos.at(pos.x, seventhRank).flatMap(situation.board.apply).isEmpty =>
               Some(s"${pos.file}${seventhRank}${pos.file}${fifthRank}")
           case _ =>
             None
@@ -91,7 +91,7 @@ object Forsyth {
     game.fullMoveNumber
   ) mkString " "
 
-  def tore(pos: Pos, n: Int): Option[Pos] = Pos.posAt(
+  def tore(pos: Pos, n: Int): Option[Pos] = Pos.at(
     ((pos.x + n - 1) % 8 + 1),
     (pos.y - (pos.x + n - 1) / 8)
   )
