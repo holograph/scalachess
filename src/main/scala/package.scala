@@ -26,6 +26,27 @@ package object chess
   type Direction = Pos => Option[Pos]
   type Directions = List[Direction]
 
+  object Directions {
+    // Named directions --
+    val up:        Direction = _.up
+    val left:      Direction = _.left
+    val right:     Direction = _.right
+    val down:      Direction = _.down
+    val upLeft:    Direction = _.upLeft
+    val downLeft:  Direction = _.downLeft
+    val upRight:   Direction = _.upRight
+    val downRight: Direction = _.downRight
+
+    // Canonical directions --
+    val cardinals = List(up, left, down, right)
+    val diagonals = List(upLeft, upRight, downLeft, downRight)
+
+    // Composition helpers --
+    import scala.language.implicitConversions
+    implicit def autoLiftDirection(dir: Pos => Option[Pos]): Option[Pos] => Option[Pos] = _ flatMap dir
+  }
+
+
   type PieceMap = Map[Pos, Piece]
 
   type PositionHash = Array[Byte]

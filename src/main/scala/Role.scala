@@ -1,6 +1,6 @@
 package chess
 
-import Pos._
+import Directions._
 
 sealed trait Role {
   val forsyth: Char
@@ -12,6 +12,7 @@ sealed trait Role {
   val dirs: Directions
   def dir(from: Pos, to: Pos): Option[Direction]
 }
+
 sealed trait PromotableRole extends Role
 
 /**
@@ -27,31 +28,33 @@ case object King extends PromotableRole {
 
 case object Queen extends PromotableRole {
   val forsyth = 'q'
-  val dirs: Directions = Rook.dirs ::: Bishop.dirs
+  val dirs: Directions = cardinals ::: diagonals
   def dir(from: Pos, to: Pos) = Rook.dir(from, to) orElse Bishop.dir(from, to)
   val projection = true
 }
+
 case object Rook extends PromotableRole {
   val forsyth = 'r'
-  val dirs: Directions = List(_.up, _.down, _.left, _.right)
+  val dirs: Directions = cardinals
   def dir(from: Pos, to: Pos) = if (to ?| from) Some(
-    if (to ?^ from) (_.up) else (_.down)
+    if (to ?^ from) up else down
   )
   else if (to ?- from) Some(
-    if (to ?< from) (_.left) else (_.right)
+    if (to ?< from) left else right
   )
   else None
   val projection = true
 }
+
 case object Bishop extends PromotableRole {
   val forsyth = 'b'
-  val dirs: Directions = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
+  val dirs: Directions = diagonals
   def dir(from: Pos, to: Pos) = if (to onSameDiagonal from) Some(
     if (to ?^ from) {
-      if (to ?< from) (_.upLeft) else (_.upRight)
+      if (to ?< from) upLeft else upRight
     }
     else {
-      if (to ?< from) (_.downLeft) else (_.downRight)
+      if (to ?< from) downLeft else downRight
     }
   )
   else None
@@ -60,14 +63,14 @@ case object Bishop extends PromotableRole {
 case object Knight extends PromotableRole {
   val forsyth = 'n'
   val dirs: Directions = List(
-    _.up flatMap (_.upLeft),
-    _.up flatMap (_.upRight),
-    _.left flatMap (_.upLeft),
-    _.left flatMap (_.downLeft),
-    _.right flatMap (_.upRight),
-    _.right flatMap (_.downRight),
-    _.down flatMap (_.downLeft),
-    _.down flatMap (_.downRight))
+    up andThen upLeft,
+    up andThen upRight,
+    left andThen upLeft,
+    left andThen downLeft,
+    right andThen upRight,
+    right andThen downRight,
+    down andThen downLeft,
+    down andThen downRight)
   def dir(from: Pos, to: Pos) = None
   val projection = false
 }
