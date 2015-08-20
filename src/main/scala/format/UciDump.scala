@@ -16,7 +16,7 @@ object UciDump {
     )
 
   def move(variant: Variant)(m: Move): String = m.castle.fold(
-    m.orig.key + m.dest.key + m.promotion.fold("")(_.forsyth.toString)
+    m.orig.key + m.dest.key + m.promotion.fold("")(Forsyth.of(_).toString)
   ) {
       case ((kf, kt), (rf, rt)) if kf == kt || !variant.standardInitialPosition => kf.key + rf.key
       case ((kf, kt), _) => kf.key + kt.key

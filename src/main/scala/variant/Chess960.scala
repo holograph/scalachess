@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import scala.util.Random
+import chess.format.Forsyth
 
 case object Chess960 extends Variant(
   id = 2,
@@ -12,7 +12,7 @@ case object Chess960 extends Variant(
   standardInitialPosition = false) {
 
   override def pieces = Variant.symmetricRank {
-    positions(scala.util.Random.nextInt(960)) flatMap Role.allByForsyth.get
+    positions(scala.util.Random.nextInt(960)) flatMap Forsyth.parseRole
   }
 
   def positionNumber(fen: String): Option[Int] =

@@ -113,7 +113,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
         case "O-O" | "o-o" | "0-0"       => succezz(Castle(KingSide))
         case "O-O-O" | "o-o-o" | "0-0-0" => succezz(Castle(QueenSide))
         case Move(role, file, rank, capture, pos, prom, check, mate) =>
-          role.headOption.fold[Option[Role]](Some(Pawn))(variant.rolesByPgn.get) flatMap { role =>
+          role.headOption.fold[Option[Role]](Some(Pawn))(c => Pgn.parseRole(c).filter(variant.roles.contains)) flatMap { role =>
             Pos posAt pos map { dest =>
               succezz(Std(
                 dest = dest,
@@ -123,7 +123,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
                 checkmate = mate != "",
                 file = if (file == "") None else fileMap get file.head,
                 rank = if (rank == "") None else rankMap get rank.head,
-                promotion = if (prom == "") None else variant.rolesPromotableByPgn get prom.last))
+                promotion = if (prom == "") None else Pgn.parseRole(prom.last).collect { case role: PromotableRole if variant.promotableRoles contains role => role }))
             }
           } getOrElse slow(str)
         case _ => slow(str)
@@ -192,7 +192,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     val checkmate = ("#" | "++") ^^^ true | success(false)
 
-    val role = mapParser(Role.allByPgn, "role") | success(Pawn)
+    val role = mapParser(Pgn.allRolesByPgn, "role") | success(Pawn)
 
     val file = mapParser(fileMap, "file")
 
@@ -200,7 +200,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     val promotion = ("="?) ~> mapParser(promotable, "promotion")
 
-    val promotable = Role.allPromotableByPgn mapKeys (_.toUpper)
+    val promotable = Pgn.allPromotableRolesByPgn
 
     val dest = mapParser(Pos.allKeys, "dest")
 

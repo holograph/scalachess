@@ -2,8 +2,6 @@ package chess
 package format
 package pgn
 
-import scala._
-
 case class Pgn(
     tags: List[Tag],
     turns: List[Turn]) {
@@ -114,5 +112,11 @@ case class Move(
 }
 
 case object Pgn {
-  def forRole(role: Role) = Forsyth.forRole(role).toUpper
+  val allRolesByPgn: Map[Char, Role] = Forsyth.allRolesByForsyth.mapKeys(_.toUpper)
+  val allPromotableRolesByPgn: Map[Char, PromotableRole] =
+    allRolesByPgn collect { case (pgn, role: PromotableRole) => pgn -> role }
+  val allPgnByRole: Map[Role, Char] = Forsyth.allForsythByRole.mapValues(_.toUpper)
+
+  def of(role: Role): Char = allPgnByRole(role)
+  def parseRole(c: Char): Option[Role] = allRolesByPgn.get(c)
 }

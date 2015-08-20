@@ -30,7 +30,7 @@ object Forsyth {
     case c :: rest => c match {
       case n if n.toInt < 58 =>
         makePieces(rest, tore(pos, n.toInt - 48) getOrElse pos)
-      case n => roleFor(n.toLower) map { role =>
+      case n => parseRole(n.toLower) map { role =>
         (pos, Piece(Color(n.isUpper), role)) :: {
           tore(pos, 1) flatMap { makePieces(rest, _) } getOrElse Nil
         }
@@ -105,9 +105,9 @@ object Forsyth {
         board(x, y) match {
           case None => empty = empty + 1
           case Some(piece) =>
-            if (empty == 0) fen append piece.forsyth.toString
+            if (empty == 0) fen append Forsyth.of(piece)
             else {
-              fen append (empty.toString + piece.forsyth)
+              fen append (empty.toString + Forsyth.of(piece))
               empty = 0
             }
         }
@@ -150,21 +150,25 @@ object Forsyth {
     case _ => None
   }
 
-  def forRole(role: Role): Char = role match {
-    case King => 'k'
-    case Queen => 'q'
-    case Rook => 'r'
-    case Bishop => 'b'
-    case Knight => 'n'
-    case Pawn => 'p'
-  }
+  val allRolesByForsyth: Map[Char, Role] = Map(
+    'k' -> King,
+    'q' -> Queen,
+    'r' -> Rook,
+    'b' -> Bishop,
+    'n' -> Knight,
+    'p' -> Pawn
+  )
 
-  def roleFor(c: Char): Option[Role] = c match {
-    case 'k' => Some(King)
-    case 'q' => Some(Queen)
-    case 'r' => Some(Rook)
-    case 'b' => Some(Bishop)
-    case 'n' => Some(Knight)
-    case 'p' => Some(Pawn)
-  }
+  val allForsythByRole: Map[Role, Char] = allRolesByForsyth.map { case (k, v) => v -> k }
+
+  val allPromotableRolesByForsyth: Map[Char, PromotableRole] =
+    allRolesByForsyth collect { case (forsyth, role: PromotableRole) => forsyth -> role }
+
+  def parseRole(c: Char): Option[Role] = allRolesByForsyth.get(c)
+
+  def of(r: Role): Char = allForsythByRole(r)
+
+  def of(piece: Piece): Char =
+    if (piece.color.white) of(piece.role).toUpper else of(piece.role)
 }
+

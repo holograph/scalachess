@@ -11,8 +11,6 @@ case class Piece(color: Color, role: Role) {
   def isMinor = oneOf(Set(Knight, Bishop))
   def isMajor = oneOf(Set(Queen, Rook))
 
-  def forsyth: Char = if (color == White) role.forsythUpper else role.forsyth
-
   // attackable positions assuming empty board
   def eyes(from: Pos, to: Pos): Boolean = role match {
     case King   => from touches to

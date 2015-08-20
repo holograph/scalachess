@@ -15,7 +15,7 @@ object Dumper {
 
       case (promotion, Pawn) =>
         captures.fold(orig.file + "x", "") +
-          promotion.fold(dest.key)(p => dest.key + "=" + p.pgn)
+          promotion.fold(dest.key)(p => dest.key + "=" + Pgn.of(p))
 
       case (_, role) => {
         // Check whether there is a need to disambiguate:
@@ -44,7 +44,7 @@ object Dumper {
           orig.file + orig.rank
         }
 
-        role.pgn + disambiguation + captures.fold("x", "") + dest.key
+        Pgn.of(role) + disambiguation + captures.fold("x", "") + dest.key
       }
     }) + {
       if (next.check) {

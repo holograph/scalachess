@@ -28,7 +28,7 @@ object Visual {
         (l, y) = line
         char ← (l zipWithIndex)
         (c, x) = char
-        role ← Role forsyth c.toLower
+        role ← Forsyth.parseRole(c.toLower)
       } yield {
         posAt(x + 1, 8 - y) map { pos => pos -> (Color(c isUpper) - role) }
       }) flatten,
@@ -44,7 +44,7 @@ object Visual {
     }
     for (y ← 8 to 1 by -1) yield {
       for (x ← 1 to 8) yield {
-        posAt(x, y) flatMap markedPoss.get getOrElse board(x, y).fold(' ')(_ forsyth)
+        posAt(x, y) flatMap markedPoss.get getOrElse board(x, y).fold(' ')(Forsyth.of)
       }
     } mkString
   } map { """\s*$""".r.replaceFirstIn(_, "") } mkString "\n"

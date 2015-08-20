@@ -125,13 +125,6 @@ abstract class Variant(
 
   def promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 
-  def rolesByForsyth: Map[Char, Role] = this.roles map { r => (r.forsyth, r) } toMap
-
-  def rolesByPgn: Map[Char, Role] = this.roles map { r => (r.pgn, r) } toMap
-
-  def rolesPromotableByPgn: Map[Char, PromotableRole] =
-    promotableRoles map { r => (r.pgn, r) } toMap
-
   def isUnmovedPawn(color: Color, pos: Pos) = {
     color == White && pos.y == 2
   } || {

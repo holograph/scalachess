@@ -2,6 +2,8 @@ package chess
 
 import java.security.MessageDigest
 
+import chess.format.Forsyth
+
 object Hash {
 
   private[chess] val size = 3
@@ -11,7 +13,7 @@ object Hash {
 
   def apply(actors: Iterable[Actor], color: Color): PositionHash = apply {
     actors.map { a =>
-      s"${a.piece.forsyth}${a.pos.key}"
+      s"${Forsyth.of(a.piece)}${a.pos.key}"
     }.mkString + color.letter
   }
 }
