@@ -1,9 +1,5 @@
 package chess
 
-import chess.format.Forsyth
-import chess.format.pgn.Pgn
-
-
 sealed trait Role {
   lazy val name = toString.toLowerCase
   val attacker: Boolean = true
